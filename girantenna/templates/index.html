@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+        <h1>Benvenuto al girantenna</h1>
+        <section>
+                <h3>Posizione</h2>
+                <form method="POST">
+                        {{ position_form.hidden_tag() }}
+                        {{ position_form.degree.label }} {{ position_form.degree() }}
+                        </br>
+                        {{ position_form.minutes.label }} {{ position_form.minutes() }}
+                        </br>
+                        {{ position_form.submit.label }} {{ position_form.submit() }}
+
+                </form>
+        </section>
+        <section>
+                <h3>Offset</h2>
+                <form method="POST">
+                        {{ offset_form.hidden_tag() }}
+                        {{ offset_form.degree.label }} {{ offset_form.degree() }}
+                        </br>
+                        {{ offset_form.minutes.label }} {{ offset_form.minutes() }}
+                        </br>
+                        {{ offset_form.submit.label }} {{ offset_form.submit() }}
+                </form>
+        </section>
+{% endblock %}
