@@ -13,6 +13,7 @@ Development
 ----------
 
 ```
+python setup.py install
 source development
 flask run
 ```
