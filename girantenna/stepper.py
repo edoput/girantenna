@@ -1,4 +1,4 @@
-import wiringpi as w
+import OPi.GPIO as GPIO
 import time
 
 
@@ -13,22 +13,37 @@ class Stepper():
         stepper motor
         """
 
-        w.wiringPiSetup()
+        GPIO.setmode(GPIO.BOARD)
         self.inp = pins
         for i in self.inp:
-            w.pinMode(i, w.OUTPUT)
-        for i in self.inp:
-            w.digitalWrite(i, 0)
+            GPIO.setup(i, GPIO.OUT)
+        GPIO.output(self.inp, GPIO.LOW)
         self.numstep = 0
         self.half = [
-            [1, 0, 0, 1],  # setp 0
-            [1, 0, 0, 0],  # step 1
-            [1, 1, 0, 0],  # step 2
-            [0, 1, 0, 0],  # step 3
-            [0, 1, 1, 0],  # step 4
-            [0, 0, 1, 0],  # step 5
-            [0, 0, 1, 1],  # step 6
-            [0, 0, 0, 1],  # step 7
+            [
+                GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH
+            ],  # phase 0
+            [
+                GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.LOW
+            ],  # phase 1
+            [
+                GPIO.HIGH, GPIO.HIGH, GPIO.LOW, GPIO.LOW
+            ],  # phase 2
+            [
+                GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.LOW
+            ],  # phase 3
+            [
+                GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW
+            ],  # phase 4
+            [
+                GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.LOW
+            ],  # phase 5
+            [
+                GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.HIGH
+            ],  # phase 6
+            [
+                GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.HIGH
+            ],  # phase 7
         ]
         self.acc = 1000  # steps
         self.dec = self.acc  # steps
@@ -38,10 +53,10 @@ class Stepper():
         """
         Stop the movement
         """
-        w.digitalWrite(self.inp[0], 0)
-        w.digitalWrite(self.inp[2], 0)
-        w.digitalWrite(self.inp[3], 0)
-        w.digitalWrite(self.inp[1], 0)
+        GPIO.output(self.inp[0], GPIO.LOW)
+        GPIO.output(self.inp[2], GPIO.LOW)
+        GPIO.output(self.inp[3], GPIO.LOW)
+        GPIO.output(self.inp[1], GPIO.LOW)
 
     def move(self, speed, rel=1, direction=1):
         """
@@ -70,8 +85,8 @@ class Stepper():
             print(self.numstep, 1.0/self.actspeed)
             fase = self.numstep % 8
             for k in range(0, 4):
-                #print k, self.inp[k],self.half[fase][k]
-                w.digitalWrite(self.inp[k], self.half[fase][k])
+                # print k, self.inp[k],self.half[fase][k]
+                GPIO.output(self.inp, self.half[fase])
             if self.actspeed < refspeed:
                     print("+ 100")
                     self.actspeed = self.actspeed + actacc
