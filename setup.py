@@ -12,7 +12,7 @@ setup(
     ],
     install_requires=[
         'flask-wtf',
-        'wiringpi',
+        'OPi.GPIO',
     ],
     zip_safe=False
 )
