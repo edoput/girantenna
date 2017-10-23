@@ -5,7 +5,7 @@ import time
 class Stepper():
     """
     Interface to a stepper motor
-    using a driver with 4 pins
+    using a driver with 4 pins for 4 coils
     """
     def __init__(self, pins):
         """
@@ -19,32 +19,49 @@ class Stepper():
             GPIO.setup(i, GPIO.OUT)
         GPIO.output(self.inp, GPIO.LOW)
         self.numstep = 0
+
+        """
+        Signals for the 4 coils in the stepper motor.
+        TODO: Clockwise is forward?
+
+            # move forward
+            for i in self.half:
+                GPIO.output(self.inp, i)
+
+            # move forward
+            for i in reversed(self.half):
+                GPIO.output(self.inp, i)
+        """
         self.half = [
-            [
-                GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH
-            ],  # phase 0
-            [
-                GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.LOW
-            ],  # phase 1
-            [
-                GPIO.HIGH, GPIO.HIGH, GPIO.LOW, GPIO.LOW
-            ],  # phase 2
-            [
-                GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.LOW
-            ],  # phase 3
-            [
-                GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW
-            ],  # phase 4
-            [
-                GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.LOW
-            ],  # phase 5
-            [
-                GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.HIGH
-            ],  # phase 6
-            [
-                GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.HIGH
-            ],  # phase 7
-        ]
+                [
+                    GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH
+                    ],  # phase 0
+                [
+                    GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.LOW
+                    ],  # phase 1
+                [
+                    GPIO.HIGH, GPIO.HIGH, GPIO.LOW, GPIO.LOW
+                    ],  # phase 2
+                [
+                    GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.LOW
+                    ],  # phase 3
+                [
+                    GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW
+                    ],  # phase 4
+                [
+                    GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.LOW
+                    ],  # phase 5
+                [
+                    GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.HIGH
+                    ],  # phase 6
+                [
+                    GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.HIGH
+                    ],  # phase 7
+                ]
+
+        """
+        Accelerate to full speed in 1000 steps
+        """
         self.acc = 1000  # steps
         self.dec = self.acc  # steps
         self.actspeed = 0
@@ -58,45 +75,44 @@ class Stepper():
         GPIO.output(self.inp[3], GPIO.LOW)
         GPIO.output(self.inp[1], GPIO.LOW)
 
-    def move(self, speed, rel=1, direction=1):
+    def move(self, speed=300, steps=1, direction=1):
         """
         speed :: int, steps per second (Hz)
-        rel :: int
-        direction :: int
+        steps :: int, steps to move
+        direction :: int 
         """
         if direction >= 0:
-                d = 1
+            d = 1
         else:
-                d = -1
+            d = -1
         refspeed = speed
 
         self.actspeed = 1
         dec = self.dec
 
-        if rel <= self.dec:
-            dec = rel/2
+        if steps <= self.dec:
+            dec = steps/2
 
-        for s in range(0, rel):
+        """
+        Every step of the movement this happens
+        """
+        for s in range(0, steps):
+            # incerement position
             self.numstep += d
-            if s == rel - dec:
+            # we are there
+            if s == steps - dec:
                 refspeed = 0
+            # next step is in
             t = 1.0/self.actspeed
             actacc = speed/self.acc
-            print(self.numstep, 1.0/self.actspeed)
+            print(self.numstep, t)
             fase = self.numstep % 8
-            for k in range(0, 4):
-                # print k, self.inp[k],self.half[fase][k]
-                GPIO.output(self.inp, self.half[fase])
+            GPIO.output(self.inp, self.half[fase])
             if self.actspeed < refspeed:
-                    print("+ 100")
-                    self.actspeed = self.actspeed + actacc
-                    if self.actspeed > speed:
-                        self.actspeed = speed
+                self.actspeed = min(self.actspeed + actacc, speed)
 
             elif self.actspeed > refspeed:
-                    print("- 100")
-                    self.actspeed = self.actspeed - actacc
-                    if self.actspeed < 0:
-                        self.actspeed = 0
-                        return
+                self.actspeed = max(self.actspeed - actacc, 0)
+                if not self.actspeed:
+                    return
             time.sleep(t)
