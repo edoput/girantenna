@@ -5,7 +5,7 @@ from flask import Flask, render_template, redirect, request
 from flask import jsonify
 
 from .forms import OffsetForm, PositionForm
-# from .stepper import Stepper
+from .stepper import Stepper
 
 version = '0.0.0'
 app = Flask(__name__)
@@ -17,7 +17,7 @@ stepper = {
     'position': 0,
 }
 
-# stepper = Stepper([7, 0, 2, 3])
+stepper = Stepper([7, 11, 13, 15])
 lock = threading.Lock()
 
 
@@ -27,16 +27,16 @@ class Movement(threading.Thread):
     thread and acquire a lock on the stepper
     """
     def __init__(self, target):
+        super(Movement, self).__init__()
         self.target = target
 
-    def run(target):
+    def run(self):
         """
         Here happens magic
         """
         lock.acquire()
         # stepper.move()
         lock.release()
-        pass
 
 
 """
