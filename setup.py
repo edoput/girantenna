@@ -11,6 +11,7 @@ setup(
         'girantenna',
     ],
     install_requires=[
+        'flask',
         'flask-wtf',
         'OPi.GPIO',
     ],
