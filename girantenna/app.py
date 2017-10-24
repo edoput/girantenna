@@ -71,10 +71,12 @@ def index():
         offset form has prefix `offset` for every key
         """
         if position_form.validate():
-            stepper['position'] = int(request.form['position-degree'], 10) + int(request.form['position-minutes'], 10) / 60
-            Movement(stepper).start()
+            target = int(request.form['position-degree'], 10) + int(request.form['position-minutes'], 10) / 60
+            app.logger.info('Target set to {target}'.format(target=target))
+            Movement(target).start()
         if offset_form.validate():
-            stepper['offset'] = int(request.form['offset-degree'], 10) + int(request.form['offset-minutes']) / 60
+            offset = int(request.form['offset-degree'], 10) + int(request.form['offset-minutes']) / 60
+            app.logger.info('Offset set to {offset}'.format(offset=offset))
         return redirect('/')
 
     return render_template(
