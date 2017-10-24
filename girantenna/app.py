@@ -96,8 +96,6 @@ def status():
     - zero offset from north
     """
     data = {
-        'orientation': stepper.get('position', 0),
-        'offset': stepper.get('offset', 0),
         'meta': meta,
     }
     resp = jsonify(data)
