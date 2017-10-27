@@ -34,8 +34,9 @@ class Movement(threading.Thread):
         """
         Here happens magic
         """
+        steps = round(self.target / 0.0878906)
         lock.acquire()
-        # stepper.move()
+        stepper.move(steps=steps)
         lock.release()
 
 
