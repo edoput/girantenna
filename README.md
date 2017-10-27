@@ -15,7 +15,7 @@ Development
 ```
 python setup.py install
 source development
-flask run
+flask run -h 0.0.0.0
 ```
 
 Deploy
